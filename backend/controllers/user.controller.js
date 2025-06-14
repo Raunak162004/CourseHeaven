@@ -1,6 +1,9 @@
 import User from '../models/user.model.js';
 import {z} from 'zod';
 import bcrypt from 'bcryptjs';
+import JWT from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const signup = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
@@ -64,3 +67,56 @@ export const signup = async (req, res) => {
         });
     }
 }
+
+export const login = async (req,res) => {
+    const {email, password} = req.body;
+    if(!email || !password) {
+        return res.status(400).json({
+            success: false,
+            message: "Email and password are required"
+        });
+    }
+
+    try{
+        const user = await User.findOne({email})
+        if(!user){
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid password"
+            });
+        }
+
+        // Generate JWT token
+        const token = JWT.sign({ id: user._id}, process.env.JWT_SECRET)
+
+        const cookieOption = {
+            secure: true,
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000 // 1 day
+        }
+        // Set token in cookies
+        res.cookie("token", token, cookieOption);
+
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+        });
+    }catch(err){
+        console.error("Error logging in user:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        }); 
+    }
+}
+
+
