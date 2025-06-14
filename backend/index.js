@@ -6,6 +6,7 @@ import fileUpload from 'express-fileupload';
 
         // import all routes
 import courseRoutes from './routes/course.route.js';
+import userRoutes from './routes/user.route.js';
 
 
 const app = express();
@@ -24,6 +25,7 @@ const port = process.env.PORT || 3000;
 db();
 
 app.use('/api/v1/course', courseRoutes);
+app.use('/api/v1/user', userRoutes);
 
                     // cloudinary configuration code
 cloudinary.config({ 
