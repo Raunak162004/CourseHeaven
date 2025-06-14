@@ -1,4 +1,6 @@
 import User from '../models/user.model.js';
+import Course from '../models/course.model.js';
+import Purchase from '../models/purchase.model.js';
 import {z} from 'zod';
 import bcrypt from 'bcryptjs';
 import JWT from 'jsonwebtoken';
@@ -129,6 +131,44 @@ export const logout = async (req,res) => {
         });
     }catch(err){
         console.error("Error logging out user:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+}
+
+export const purchases = async (req,res) => {
+    const userId = req.user.id
+    if(!userId) {
+        return res.status(400).json({
+            success: false,
+            message: "token is missing please login again"
+        });
+    }
+
+    try{
+        const purchased = await Purchase.find({userId})
+        let purchasedCourseId = [];
+        for(let i=0; i<purchased.length; i++){
+            purchasedCourseId.push(purchased[i].courseId);
+        }
+        const courseData = await Course.find({_id: { $in: purchasedCourseId }});
+        if(purchasedCourseId.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No purchases found"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "User purchases fetched successfully",
+            purchased,
+            courseData
+        });
+    }catch(err){
+        console.error("Error fetching user purchases:", err);
         return res.status(500).json({
             success: false,
             message: "Internal server error",

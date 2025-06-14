@@ -44,7 +44,7 @@ export const isLoggedIn = (req,res,next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
-        // console.log(decoded)
+        // console.log(decoded)    ->    {id: '', iat: ''}
         next();
     } catch (error) {
         console.error('Error in auth middleware:', error);
