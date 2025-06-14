@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import db from './config/db.js';
 import { v2 as cloudinary } from 'cloudinary';
 import fileUpload from 'express-fileupload';
+import cookieParser from 'cookie-parser';
 
         // import all routes
 import courseRoutes from './routes/course.route.js';
@@ -18,7 +19,8 @@ app.use(express.json());
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: './uploads'
-}));               
+}));    
+app.use(cookieParser());           
 
 const port = process.env.PORT || 3000;
 
