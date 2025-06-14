@@ -15,15 +15,13 @@ export const createCourse = async (req, res) => {
 
     const allowedFormat = ["image/png", "image/jpeg"];
     if (!allowedFormat.includes(image.mimetype)) {
-      return res
-        .status(400)
-        .json({
-          message: "Invalid image format. Only PNG and JPG are allowed",
-        });
+      return res.status(400).json({
+        message: "Invalid image format. Only PNG and JPG are allowed",
+      });
     }
 
-    const uploadResult = await cloudinary.uploader.upload(image.tempFilePath)
-    if(!uploadResult || uploadResult.error){
+    const uploadResult = await cloudinary.uploader.upload(image.tempFilePath);
+    if (!uploadResult || uploadResult.error) {
       return res.status(500).json({ message: "Image upload failed" });
     }
 
@@ -59,3 +57,96 @@ export const createCourse = async (req, res) => {
     });
   }
 };
+
+export const updateCourse = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const updatedCourse = await Course.findByIdAndUpdate(
+      { _id: id },
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!updatedCourse) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Course updated successfully",
+      course: updatedCourse,
+    });
+  } catch (e) {
+    console.error("Error updating course:", e);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: e.message,
+    });
+  }
+};
+
+export const deleteCourse = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedCourse = await Course.findByIdAndDelete({ _id: id });
+    if (!deletedCourse) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Course deleted successfully",
+      course: deletedCourse,
+    });
+  } catch (err) {
+    console.error("Error deleting course:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+export const getCourses = async (req,res) => {
+    try{
+        const courses = await Course.find()
+        if(!courses || courses.length === 0) {
+            return res.status(404).json({ message: "No courses found" });
+        }
+        res.status(200).json({
+            success: true,
+            message: "Courses fetched successfully",
+            courses,
+        });
+    }
+    catch(err){
+        console.error("Error fetching courses:", err);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message,
+        });
+    }
+}
+
+export const getSingleCourse = async (req,res) => {
+    const id = req.params.id;
+    try{
+        const course = await Course.findOne({ _id: id });
+        if(!course){
+            return res.status(404).json({ message: "Course not found" });
+        }
+        res.status(200).json({
+            success: true,
+            message: "Course fetched successfully",
+            course,
+        });
+    }catch(err){
+        console.error("Error fetching course:", err);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message,
+        });
+    }        
+}
