@@ -95,12 +95,13 @@ export const login = async (req,res) => {
         }
 
         // Generate JWT token
-        const token = JWT.sign({ id: user._id}, process.env.JWT_SECRET)
+        const token = JWT.sign({ id: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'});
 
         const cookieOption = {
-            secure: true,
+            secure: process.env.NODE_ENV === 'production', // true for https only
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            sameSite: 'strict' // protect us from CSRF attacks 
         }
         // Set token in cookies
         res.cookie("token", token, cookieOption);
