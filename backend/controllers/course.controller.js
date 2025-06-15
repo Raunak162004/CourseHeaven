@@ -3,6 +3,14 @@ import Purchase from "../models/purchase.model.js";
 import { v2 as cloudinary } from "cloudinary";
 
 export const createCourse = async (req, res) => {
+
+  const adminId = req.user.id
+  if(!adminId){
+    return res.status(400).json({
+      message: "adminId not found"
+    })
+  }
+
   const { title, description, price } = req.body;
   try {
     if (!title || !description || !price) {
@@ -36,6 +44,7 @@ export const createCourse = async (req, res) => {
         public_id: uploadResult.public_id,
         url: uploadResult.secure_url,
       },
+      createrId: adminId
     };
 
     const course = await Course.create(courseData);
@@ -60,11 +69,14 @@ export const createCourse = async (req, res) => {
 };
 
 export const updateCourse = async (req, res) => {
+
+  const adminId = req.user.id;
+
   const { id } = req.params;
 
   try {
     const updatedCourse = await Course.findByIdAndUpdate(
-      { _id: id },
+      { _id: id, createrId: adminId },
       req.body,
       { new: true, runValidators: true }
     );
@@ -87,11 +99,14 @@ export const updateCourse = async (req, res) => {
 };
 
 export const deleteCourse = async (req, res) => {
+
+  const adminId = req.user.id
+
   const id = req.params.id;
   try {
-    const deletedCourse = await Course.findByIdAndDelete({ _id: id });
+    const deletedCourse = await Course.findByIdAndDelete({ _id: id, createrId: adminId });
     if (!deletedCourse) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: "Course not found or you must be admin to delete a course" });
     }
     res.status(200).json({
       success: true,

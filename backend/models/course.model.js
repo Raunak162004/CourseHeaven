@@ -27,6 +27,10 @@ const courseSchema = new mongoose.Schema({
             type: String,
             required: true
         }
+    },
+    createrId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Admin'
     }
 }, { timestamps: true });
 
