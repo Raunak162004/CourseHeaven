@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
         // import all routes
 import courseRoutes from './routes/course.route.js';
 import userRoutes from './routes/user.route.js';
+import adminRoutes from './routes/admin.route.js';
 
 
 const app = express();
@@ -28,6 +29,7 @@ db();
 
 app.use('/api/v1/course', courseRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/admin', adminRoutes)
 
                     // cloudinary configuration code
 cloudinary.config({ 

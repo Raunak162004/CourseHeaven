@@ -1,24 +1,24 @@
 import User from '../models/user.model.js';
-import Course from '../models/course.model.js';
-import Purchase from '../models/purchase.model.js';
 import {z} from 'zod';
 import bcrypt from 'bcryptjs';
 import JWT from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import Admin from '../models/admin.model.js';
 dotenv.config();
+
 
 export const signup = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     // Validate input using zod
-    const userSchema = z.object({
+    const adminSchema = z.object({
         firstName: z.string().min(1, "First name is required"),
         lastName: z.string().min(1, "Last name is required"),
         email: z.string().email("Invalid email format"),
         password: z.string().min(6, "Password must be at least 6 characters long")
     });
 
-    const validateData = userSchema.safeParse(req.body);
+    const validateData = adminSchema.safeParse(req.body);
     if (!validateData.success) {
         return res.status(400).json({
             success: false,
@@ -35,11 +35,11 @@ export const signup = async (req, res) => {
     }
 
     try{
-        const existingUser = await User.findOne({email})
+        const existingUser = await Admin.findOne({email})
         if(existingUser) {
             return res.status(400).json({
                 success: false,
-                message: "User already exists"
+                message: "Admin already exists"
             });
         }
 
@@ -47,18 +47,18 @@ export const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         req.body.password = hashedPassword;
 
-        const newUser = await User.create(req.body);
+        const newUser = await Admin.create(req.body);
 
         if(!newUser) {
             return res.status(500).json({
                 success: false,
-                message: "User creation failed"
+                message: "Admin creation failed"
             });
         }
 
         return res.status(201).json({
             success: true,
-            message: "User created successfully",
+            message: "Admin created successfully",
         });
     }catch(e){
         console.error("Error creating user:", e);
@@ -80,7 +80,7 @@ export const login = async (req,res) => {
     }
 
     try{
-        const user = await User.findOne({email})
+        const user = await Admin.findOne({email})
         if(!user){
             return res.status(404).json({
                 success: false,
@@ -97,7 +97,7 @@ export const login = async (req,res) => {
         }
 
         // Generate JWT token
-        const token = JWT.sign({ id: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'});
+        const token = JWT.sign({ id: user._id}, process.env.JWT_SECRET_ADMIN, {expiresIn: '1d'});
 
         const cookieOption = {
             secure: process.env.NODE_ENV === 'production', // true for https only
@@ -143,43 +143,3 @@ export const logout = async (req,res) => {
         });
     }
 }
-
-export const purchases = async (req,res) => {
-    const userId = req.user.id
-    if(!userId) {
-        return res.status(400).json({
-            success: false,
-            message: "token is missing please login again"
-        });
-    }
-
-    try{
-        const purchased = await Purchase.find({userId})
-        let purchasedCourseId = [];
-        for(let i=0; i<purchased.length; i++){
-            purchasedCourseId.push(purchased[i].courseId);
-        }
-        const courseData = await Course.find({_id: { $in: purchasedCourseId }});
-        if(purchasedCourseId.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "No purchases found"
-            });
-        }
-        return res.status(200).json({
-            success: true,
-            message: "User purchases fetched successfully",
-            purchased,
-            courseData
-        });
-    }catch(err){
-        console.error("Error fetching user purchases:", err);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error",
-            error: err.message
-        });
-    }
-}
-
-
