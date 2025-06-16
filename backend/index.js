@@ -4,6 +4,7 @@ import db from './config/db.js';
 import { v2 as cloudinary } from 'cloudinary';
 import fileUpload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
         // import all routes
 import courseRoutes from './routes/course.route.js';
@@ -21,7 +22,13 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: './uploads'
 }));    
-app.use(cookieParser());           
+app.use(cookieParser());  
+app.use(cors({
+  origin: process.env.BASE_URL,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));         
 
 const port = process.env.PORT || 3000;
 
