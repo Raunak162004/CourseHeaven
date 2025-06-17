@@ -15,10 +15,11 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(email)
 
     try {
       const response = await axios.post(
-        `http://localhost:4001/user/login`,
+        `http://localhost:4001/api/v1/user/login`,
         {
           email,
           password,
@@ -30,9 +31,10 @@ function Login() {
           },
         }
       );
+      // console.log(response)
       console.log("Login successful: ", response.data);
       toast.success(response.data.message);
-      localStorage.setItem("user", JSON.stringify(response.data));
+      localStorage.setItem("user", JSON.stringify(response.data.token));
       navigate("/");
     } catch (error) {
       if (error.response) {

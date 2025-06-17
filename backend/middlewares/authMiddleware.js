@@ -1,56 +1,24 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 
-export const isLoggedIn = (req,res,next) => {
-    // console.log(req.cookies); --> this is a object in which one key is token
+function userMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
 
-    // try{
-    //     let token = req.cookies.token || "";
-    //     console.log("Token found", token ? 'yes' : 'no');
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ errors: "No token provided" });
+  }
+  const token = authHeader.split(" ")[1];
 
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
+    req.userId = decoded.id;
 
-    //     if(!token){
-    //         console.log("No token found");
-    //         return res.status(401).json({
-    //             success: false,
-    //             message: "Authentication failed"
-    //         })
-    //     }
-
-    //     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    //     console.log("Decoded token", decoded);
-
-    //     req.user = decoded
-
-    //     next()
-
-    // }catch(error){
-    //     console.log('Error in auth middleware');
-    //     return res.status(500).json({
-    //         success: false,
-    //         message: "Authentication failed"
-    //     })
-    // }
-
-
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({
-            success: false,
-            message: "Authentication failed"
-        });
-    }
-
-    const token = authHeader.split(' ')[1];
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        // console.log(decoded)    ->    {id: '', iat: ''}
-        next();
-    } catch (error) {
-        console.error('Error in auth middleware:', error);
-        return res.status(500).json({
-            success: false,
-            message: "Authentication failed"
-        });
-    }
+    next();
+  } catch (error) {
+        return res.status(401).json({ errors: "Invalid token or expired" });
+  }
 }
+
+export default userMiddleware;
