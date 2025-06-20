@@ -183,17 +183,17 @@ export const buyCourses = async (req, res) => {
     }
 
     // stripe payment code goes here!!
-    const amount = course.price;
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-    });
+    // const amount = course.price;
+    // const paymentIntent = await stripe.paymentIntents.create({
+    //   amount: amount,
+    //   currency: "usd",
+    //   payment_method_types: ["card"],
+    // });
 
     res.status(201).json({
       message: "Course purchased successfully",
       course,
-      clientSecret: paymentIntent.client_secret,
+      // clientSecret: paymentIntent.client_secret,
     });
   } catch (error) {
     res.status(500).json({ errors: "Error in course buying" });

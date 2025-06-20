@@ -15,18 +15,20 @@ const Home = () => {
   const handleLogout = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/v1/user/logout`,
+        `http://localhost:4001/api/v1/user/logout`,
         {
           withCredentials: true,
         }
       );
 
-      toast.success(response.data.message);
-      setIsLoggedIn(false);
+      console.log("hi")
+
+      toast.success(response.data.message || "logout sucessful");
       localStorage.removeItem("user")
+      setIsLoggedIn(false);
     } catch (err) {
       console.log("error in logging out", err);
-      toast.error(error.response.data.errors || "error in logging out");
+      toast.error(err.response.data.errors || "error in logging out");
     }
   };
 
@@ -97,7 +99,7 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-black to-blue-950 h-screen text-white overflow-y-auto">
+    <div className="bg-gradient-to-r from-black to-blue-950 h-screen text-white overflow-y-auto overflow-x-Link">
       {/* header */}
       <header className="flex place-content-between p-6">
         <div className="flex text-white items-center gap-1">
@@ -140,12 +142,12 @@ const Home = () => {
           Sharpen your skills with courses crafted by experts.
         </p>
         <div className="space-x-4 mt-8">
-          <button className="py-3 px-6 font-semibold rounded-md cursor-pointer hover:bg-green-500 transition-all border">
+          <Link to={"/courses"} className="py-3 px-6 font-semibold rounded-md cursor-pointer hover:bg-green-500 transition-all border">
             Explore Courses
-          </button>
-          <button className="py-3 px-6 font-semibold rounded-md cursor-pointer hover:bg-green-500 transition-all border">
+          </Link>
+          <Link className="py-3 px-6 font-semibold rounded-md cursor-pointer hover:bg-green-500 transition-all border">
             Courses Videos
-          </button>
+          </Link>
         </div>
       </section>
 

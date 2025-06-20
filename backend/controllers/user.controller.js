@@ -204,7 +204,7 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    if (!req.cookies.token) {
+    if (!req.cookies.jwt) {
       return res.status(401).json({
         message: "Kindly login first",
       });
