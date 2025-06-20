@@ -10,6 +10,6 @@ router.put('/update/:id', isAdmin, updateCourse)
 router.delete('/delete/:id', isAdmin, deleteCourse)
 router.get('/courses', getCourses)
 router.get('/:id', getSingleCourse)
-router.post('/buy/:id', userMiddleware, buyCourses)
+router.post('/buy/:courseId', userMiddleware, buyCourses)
 
 export default router;

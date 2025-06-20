@@ -10,6 +10,7 @@ import cors from 'cors';
 import courseRoutes from './routes/course.route.js';
 import userRoutes from './routes/user.route.js';
 import adminRoutes from './routes/admin.route.js';
+import orderRoute from './routes/order.route.js'
 
 
 const app = express();
@@ -36,7 +37,8 @@ db();
 
 app.use('/api/v1/course', courseRoutes);
 app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/admin', adminRoutes);
+app.use("/api/v1/order", orderRoute);
 
                     // cloudinary configuration code
 cloudinary.config({ 

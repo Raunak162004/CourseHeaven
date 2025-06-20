@@ -1,6 +1,8 @@
 import Course from "../models/course.model.js";
 import Purchase from "../models/purchase.model.js";
 import { v2 as cloudinary } from "cloudinary";
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const createCourse = async (req, res) => {
 
@@ -166,12 +168,18 @@ export const getSingleCourse = async (req, res) => {
   }
 };
 
+import Stripe from 'stripe';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
 export const buyCourses = async (req, res) => {
-  const { userId } = req;
-  const { courseId } = req.params;
+  const userId = req.userId;
+  console.log(userId)
+  // console.log(req)
+  const courseId = req.params.courseId;
+  console.log(courseId)
 
   try {
-    const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId); // 
     if (!course) {
       return res.status(404).json({ errors: "Course not found" });
     }
@@ -183,17 +191,23 @@ export const buyCourses = async (req, res) => {
     }
 
     // stripe payment code goes here!!
-    // const amount = course.price;
-    // const paymentIntent = await stripe.paymentIntents.create({
-    //   amount: amount,
-    //   currency: "usd",
-    //   payment_method_types: ["card"],
-    // });
+
+    const amount = course.price;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "usd",
+      payment_method_types: ["card"],
+    });
+
+    const purchase = await Purchase.create({
+      userId,
+      courseId
+    })
 
     res.status(201).json({
       message: "Course purchased successfully",
       course,
-      // clientSecret: paymentIntent.client_secret,
+      clientSecret: paymentIntent.client_secret,
     });
   } catch (error) {
     res.status(500).json({ errors: "Error in course buying" });

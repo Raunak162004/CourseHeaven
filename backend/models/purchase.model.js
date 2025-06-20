@@ -12,7 +12,7 @@ const purchaseSchema= new mongoose.Schema({
         ref: 'Course',
         required: true
     }    
-})
+},{timestamps:true})
 
 const Purchase = mongoose.model('Purchase', purchaseSchema);
 
