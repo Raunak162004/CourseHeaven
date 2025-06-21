@@ -99,7 +99,7 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-black to-blue-950 h-screen text-white overflow-y-auto overflow-x-Link">
+    <div className="bg-gradient-to-r from-black to-blue-950 h-screen text-white overflow-y-auto overflow-x-hidden">
       {/* header */}
       <header className="flex place-content-between p-6">
         <div className="flex text-white items-center gap-1">
