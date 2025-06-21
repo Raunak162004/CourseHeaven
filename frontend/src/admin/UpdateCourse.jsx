@@ -17,7 +17,7 @@ function UpdateCourse() {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:4001/api/v1/course/update/${id}`, {
+        const { data } = await axios.get(`http://localhost:4001/api/v1/course/${id}`, {
           withCredentials: true,
         });
         console.log(data);
@@ -62,7 +62,7 @@ function UpdateCourse() {
     }
     try {
       const response = await axios.put(
-        `${BACKEND_URL}/course/update/${id}`,
+        `http://localhost:4001/api/v1/course/update/${id}`,
         formData,
         {
           headers: {
